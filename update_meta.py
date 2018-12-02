@@ -38,15 +38,18 @@ def update_metadata(match_id, cursor, db):
     url = 'http://www.football-lineups.com/match/%s' % match_id
     r = session.get(url)
     r.html.encoding = 'ISO-8859-1'
-    print(r.text)
 
     # HEIGHT #
     trs = r.html.find('tr')
     trs = [tr for tr in trs if 'align' in tr.attrs.keys() and
            tr.attrs['align'] == 'center']
-    heights = trs[-3].find('td')
-    home_height = heights[0].text[:4]
-    away_height = heights[2].text[:4]
+
+    for i, tr in enumerate(trs):
+        if 'Height Avg' in tr.text:
+            home_height = tr.find('td')[0].text[:4]
+            away_height = tr.find('td')[2].text[:4]
+            break
+
     print(match_id, home_height, away_height)
 
     # INSERT #
