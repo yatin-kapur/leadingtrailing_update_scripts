@@ -38,15 +38,16 @@ def update_metadata(match_id, cursor, db):
     url = 'http://www.football-lineups.com/match/%s' % match_id
     r = session.get(url)
     r.html.encoding = 'ISO-8859-1'
+    print(r.text)
 
     # HEIGHT #
     trs = r.html.find('tr')
     trs = [tr for tr in trs if 'align' in tr.attrs.keys() and
            tr.attrs['align'] == 'center']
     heights = trs[-3].find('td')
-    home_height = heights[0].text
-    away_height = heights[2].text
-    print(home_height, away_height)
+    home_height = heights[0].text[:4]
+    away_height = heights[2].text[:4]
+    print(match_id, home_height, away_height)
 
     # INSERT #
     data_dict = {'match_id': match_id,
@@ -74,9 +75,19 @@ def update_matches(tourn, cursor, db):
     current = cursor.fetchall()
     current = [d[0] for d in current]
 
+    metadata_query = """
+    select match_id
+    from match_metadata;
+    """
+
+    cursor.execute(metadata_query)
+    meta = cursor.fetchall()
+    meta = [d[0] for d in meta]
+
     for match_id in current:
         # update_matchday_entry(match_id, cursor, db)
-        update_metadata(match_id, cursor, db)
+        if match_id not in meta:
+            update_metadata(match_id, cursor, db)
 
 
 def all_comps():
