@@ -111,4 +111,4 @@ def all_comps():
         update_matches(c, cursor, db)
 
 
-all_comps()
+#all_comps()
