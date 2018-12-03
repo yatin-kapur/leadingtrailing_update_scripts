@@ -2,7 +2,7 @@ import dbconfig
 import MySQLdb
 import bs4 as bs
 import urllib3
-import update_meta
+from update_meta import update_metadata, update_matchday_entry
 import add_game_entry
 
 db_dict = dbconfig.read_db_config()
@@ -37,8 +37,8 @@ def update_games(tourn):
         if match not in current:
             try:
                 add_game_entry.create_match_record(match, tourn, db, cursor)
-                update_meta.update_matchday_entry(match, cursor, db)
-                update_meta.update_metadata(match, cursor, db)
+                update_matchday_entry(match, cursor, db)
+                update_metadata(match, cursor, db)
             except Exception as e:
                 print(match)
                 print('ERROR: ' + str(e))
