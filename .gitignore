@@ -1,0 +1,6 @@
+*.pyc
+/.ropeproject/*
+config.ini
+dbconfig.py
+Pipfile
+Pipfile.lock
