@@ -36,9 +36,9 @@ def update_games(tourn):
     for match in match_ids:
         if match not in current:
             try:
-                add_game_entry.create_match_record(match, tourn, db, cursor)
                 update_matchday_entry(match, cursor, db)
                 update_metadata(match, cursor, db)
+                add_game_entry.create_match_record(match, tourn, db, cursor)
             except Exception as e:
                 print(match)
                 print('ERROR: ' + str(e))
