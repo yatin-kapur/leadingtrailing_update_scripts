@@ -67,10 +67,10 @@ def update_matches(tourn, cursor, db):
     query = """
     select match_id
     from Matches
-    where competition = '%s';
+    where competition = '%s'
     """ % tourn
     # update matchday:
-    # query = query + "and matchday = 0"
+    query = query + "and matchday = 0"
 
     query = query + ";"
 
@@ -88,7 +88,7 @@ def update_matches(tourn, cursor, db):
     meta = [d[0] for d in meta]
 
     for match_id in current:
-        # update_matchday_entry(match_id, cursor, db)
+        update_matchday_entry(match_id, cursor, db)
         if match_id not in meta:
             update_metadata(match_id, cursor, db)
 
@@ -111,4 +111,4 @@ def all_comps():
         update_matches(c, cursor, db)
 
 
-# all_comps()
+all_comps()
