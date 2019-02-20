@@ -2,6 +2,8 @@ import dbconfig
 import MySQLdb
 import insert
 import pandas as pd
+import numpy as np
+import model
 
 db_dict = dbconfig.read_db_config()
 db = MySQLdb.connect(host=db_dict['host'],
@@ -141,14 +143,23 @@ def fetch_and_update(matches, teams, comp, standings):
     df = pd.DataFrame(standings)
     df = df.transpose()
     df.sort_values(by=['pts', 'gd', 'gs', 'ga'], ascending=[0, 0, 0, 1],
-                inplace=True)
-    df = df[['gp', 'pts', 'gs', 'ga', 'gd', 'lead_time', 'trail_time', 'competition']]
+                   inplace=True)
+    df = df[['gp', 'pts', 'gs', 'ga', 'gd', 'lead_time', 'trail_time',
+             'competition']]
     df = df.reset_index()
     df['lead_time_p90'] = df['lead_time'] / df['gp']
     df['trail_time_p90'] = df['trail_time'] / df['gp']
-    df.columns = ['team', 'gp', 'pts', 'gs', 'ga', 'gd', 'lead_time', 'trail_time',
-                'competition', 'lead_time_p90', 'trail_time_p90']
+    df.columns = ['team', 'gp', 'pts', 'gs', 'ga', 'gd', 'lead_time',
+                  'trail_time', 'competition', 'lead_time_p90',
+                  'trail_time_p90']
     df['pos'] = df.index + 1
+
+    # create numpy array of data for the model
+    X = np.asarray(df[['lead_time_p90', 'trail_time_p90', 'gs', 'ga']])
+    df['top_four'] = model.top_four(comp, X)
+    df['top_six'] = model.top_six(comp, X)
+    df['relegation'] = model.relegation(comp, X)
+    print(df)
 
     # convert df to dictionary and insert them into sql database
     data_dict = df.to_dict('records')
@@ -160,9 +171,9 @@ def update_comp(comp):
     print(comp)
     teams = get_teams(comp)
     # initialize dictionary for team data
-    standings = {t: {'gp': 0, 'pts': 0, 'gs': 0, 'ga': 0, 'gd': 0, 'lead_time': 0,
-                    'trail_time': 0, 'competition': comp}
-                for t in teams}
+    standings = {t: {'gp': 0, 'pts': 0, 'gs': 0, 'ga': 0, 'gd': 0,
+                     'lead_time': 0, 'trail_time': 0, 'competition': comp}
+                 for t in teams}
 
     matches = get_matches(comp)
 
@@ -170,5 +181,6 @@ def update_comp(comp):
     print(standings)
 
 
-
-update_comp('FA_Premier_League_2018-2019')
+if __name__ == "__main__":
+    competition = 'FA_Premier_League_2018-2019'
+    update_comp(competition)
