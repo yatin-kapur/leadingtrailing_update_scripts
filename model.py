@@ -1,7 +1,7 @@
 import MySQLdb
 import numpy as np
 from sklearn import linear_model
-from sklearn.cross_validation import cross_val_score
+from sklearn.model_selection import cross_val_score
 
 db = MySQLdb.connect(host='130.211.158.172',
                      user='root',

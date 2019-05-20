@@ -7,6 +7,7 @@ from requests_html import HTMLSession
 
 
 def create_match_record(match_id, tourn, db, cursor):
+    print(match_id, ' starting this shit')
     session = HTMLSession()
     url = 'http://www.football-lineups.com/match/%s' % match_id
     r = session.get(url)
